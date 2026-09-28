@@ -26,7 +26,7 @@ Samples are in `sample-data/`: `exam-demo-data.xlsx` (240 students + 6 halls) an
 
 ## Demo script (on stage)
 
-1. **Open the link.** Point to the rule card: same subject never beside, in front of, or behind.
+1. **Open the link.** Point to the rule card: same subject never beside, in front of, or behind. Halls follow the Kerala layout: two benches per row (A and B), two students per bench.
 2. **Click "Sample Excel"** to download the file. Open it and show the teachers it's an ordinary class list with a Halls sheet.
 3. **Drag the Excel file onto the upload box.** Point to the 240 students, 6 classes and the subject chips. Mention that Economics comes from both Commerce and Humanities and is treated as one paper.
 4. **Show Step 2.** Change a hall's rows and watch the capacity bar update live. Delete two halls to show the "short by N seats" warning, then click "Use demo data" to restore them.

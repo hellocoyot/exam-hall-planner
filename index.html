@@ -390,7 +390,7 @@ dialog .df { padding: 14px 24px 22px; display: flex; justify-content: flex-end; 
 
     <!-- STEP 2 -->
     <div class="card">
-      <div class="card-h"><div class="step-no" id="s2no">2</div><div><h2>Exam &amp; halls</h2><p>Halls are filled in the order listed</p></div></div>
+      <div class="card-h"><div class="step-no" id="s2no">2</div><div><h2>Exam &amp; halls</h2><p>Kerala halls: 2 benches per row (A and B), 2 students per bench</p></div></div>
       <div class="card-b">
         <div class="exam-meta">
           <label class="f">Exam name<input class="inp" id="examName" value="Higher Secondary First Terminal Examination"></label>
@@ -564,7 +564,7 @@ dialog .df { padding: 14px 24px 22px; display: flex; justify-content: flex-end; 
     state.halls.splice(+b.dataset.del, 1); renderHalls();
   });
   $('#addHall').onclick = () => {
-    state.halls.push({ name: 'Hall ' + (state.halls.length + 1), rows: 6, benches: 3, perBench: 2 });
+    state.halls.push({ name: 'Hall ' + (state.halls.length + 1), rows: 10, benches: 2, perBench: 2 });
     renderHalls();
     const inputs = $('#hallRows').querySelectorAll('input[data-k="name"]'); inputs[inputs.length - 1].select();
   };
@@ -862,7 +862,7 @@ dialog .df { padding: 14px 24px 22px; display: flex; justify-content: flex-end; 
     const byReg = (a, b) => a.reg.localeCompare(b.reg, undefined, { numeric: true });
     let html = '';
     if (kind === 'chart') {
-      html = halls.map(h => `<section class="pg land">${pageHead('Hall Seating Chart', h.hall.name, h.count)}<div style="zoom:${Math.min(1, 8 / h.hall.rows, 5 / h.hall.benches).toFixed(3)}">${roomHtml(h, true)}</div><div class="legend">${legendHtml(h)}</div></section>`).join('');
+      html = halls.map(h => `<section class="pg">${pageHead('Hall Seating Chart', h.hall.name, h.count)}<div style="zoom:${Math.min(1.1, 12 / h.hall.rows, 3 / (h.hall.benches * h.hall.perBench / 2)).toFixed(3)}">${roomHtml(h, true)}</div><div class="legend">${legendHtml(h)}</div></section>`).join('');
     } else if (kind === 'door') {
       html = halls.map(h => { const list = h.grid.flat().filter(Boolean).sort(byReg); return `<section class="pg door"><h1>${esc(h.hall.name)}</h1><div class="sub">${esc($('#examName').value)}<br>${fmtDate($('#examDate').value)} · ${esc($('#examSession').value)} · ${h.count} candidates</div><div class="regs">${list.map(s => `<div>${esc(s.reg)}</div>`).join('')}</div></section>`; }).join('');
     } else if (kind === 'attend') {
@@ -872,7 +872,7 @@ dialog .df { padding: 14px 24px 22px; display: flex; justify-content: flex-end; 
       all.sort(byReg);
       html = `<section class="pg">${pageHead('Master Allotment List', 'All halls', all.length)}<table class="pt"><thead><tr><th>Sl No</th><th>Register No</th><th>Student Name</th><th>Class</th><th>Subject</th><th>Hall</th><th>Seat</th></tr></thead><tbody>${all.map((s, i) => `<tr><td>${i + 1}</td><td class="mono">${esc(s.reg)}</td><td>${esc(s.name)}</td><td>${esc(s.cls)}</td><td>${esc(s.subject)}</td><td>${esc(s.hall)}</td><td class="mono">${s.seat}</td></tr>`).join('')}</tbody></table></section>`;
     }
-    area.innerHTML = html + `<style>@media print{@page{size:A4 ${kind === 'chart' ? 'landscape' : 'portrait'}}}</style>`;
+    area.innerHTML = html + `<style>@media print{@page{size:A4 portrait}}</style>`;
     if (!noDialog) setTimeout(() => window.print(), 50);
   }
 

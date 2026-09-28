@@ -38,12 +38,12 @@
   }
 
   const halls = [
-    { name: 'Hall 1',      rows: 8, benches: 3, perBench: 2 },
-    { name: 'Hall 2',      rows: 8, benches: 3, perBench: 2 },
-    { name: 'Hall 3',      rows: 8, benches: 3, perBench: 2 },
-    { name: 'Room 12',     rows: 7, benches: 3, perBench: 2 },
-    { name: 'Room 14',     rows: 7, benches: 3, perBench: 2 },
-    { name: 'Science Lab', rows: 6, benches: 4, perBench: 2 }
+    { name: 'Hall 1',      rows: 12, benches: 2, perBench: 2 },
+    { name: 'Hall 2',      rows: 12, benches: 2, perBench: 2 },
+    { name: 'Hall 3',      rows: 12, benches: 2, perBench: 2 },
+    { name: 'Room 12',     rows: 11, benches: 2, perBench: 2 },
+    { name: 'Room 14',     rows: 11, benches: 2, perBench: 2 },
+    { name: 'Science Lab', rows: 12, benches: 2, perBench: 2 }
   ];
 
   const api = { students, halls };
