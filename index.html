@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Exam Hall Planner</title>
+<meta name="description" content="Higher Secondary exam hall seating in seconds — a Coyot AI demo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231A3CC1'/%3E%3Crect x='7' y='9' width='8' height='6' rx='1.5' fill='white'/%3E%3Crect x='17' y='9' width='8' height='6' rx='1.5' fill='white' opacity='.55'/%3E%3Crect x='7' y='17' width='8' height='6' rx='1.5' fill='white' opacity='.55'/%3E%3Crect x='17' y='17' width='8' height='6' rx='1.5' fill='white'/%3E%3C/svg%3E">
+<style>
+:root {
+  --brand: #1A3CC1; --brand-600: #1532A3; --brand-700: #102784; --brand-50: #EEF2FD; --brand-100: #DCE4FB; --brand-200: #B6C6F5;
+  --bg: #F5F7FB; --surface: #FFFFFF; --surface-2: #F0F3F9; --line: #DDE3EE; --line-strong: #C5CEDF;
+  --text: #121A2E; --text-2: #46506A; --text-3: #6B7590;
+  --ok: #0F7B4F; --ok-bg: #E4F5EC; --warn: #9A5B00; --warn-bg: #FFF3DC; --err: #B42318; --err-bg: #FDECEA;
+  --shadow: 0 1px 2px rgba(16,24,48,.06), 0 4px 16px rgba(16,24,48,.06);
+  --shadow-lg: 0 2px 4px rgba(16,24,48,.06), 0 16px 40px rgba(16,24,48,.10);
+  --radius: 14px;
+  /* subject slots: background / ink */
+  --s0: #DCE6FF; --s0i: #1A3CC1; --s1: #D5F2EA; --s1i: #0B6B52; --s2: #FFE9C7; --s2i: #8A4B00;
+  --s3: #FBDDE3; --s3i: #A31D3E; --s4: #E2F1CF; --s4i: #3C6A0E; --s5: #D6EEF8; --s5i: #0B5E83;
+  --s6: #FFE0D1; --s6i: #A13C0B; --s7: #E6E9F0; --s7i: #333D55; --s8: #F7EFC0; --s8i: #6B5A00; --s9: #DCEFF0; --s9i: #1E5F63;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --brand: #6F8DF5; --brand-600: #8AA2F7; --brand-700: #A9BBFA; --brand-50: #18203A; --brand-100: #1E2A4D; --brand-200: #2E3F75;
+  --bg: #0C111D; --surface: #141B2B; --surface-2: #1A2336; --line: #273149; --line-strong: #34405C;
+  --text: #EDF1FA; --text-2: #B3BCD2; --text-3: #8791AB;
+  --ok: #4FD69C; --ok-bg: #0F2A20; --warn: #F5B84C; --warn-bg: #2E2410; --err: #FF8A80; --err-bg: #331615;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.25); --shadow-lg: 0 16px 40px rgba(0,0,0,.4);
+  --s0: #22336E; --s0i: #BFD0FF; --s1: #11443A; --s1i: #9BEBD3; --s2: #4A3410; --s2i: #FFD89A;
+  --s3: #52202E; --s3i: #FFB8C8; --s4: #2C4414; --s4i: #C9EE9F; --s5: #113F55; --s5i: #A8DDF5;
+  --s6: #52291A; --s6i: #FFC2A6; --s7: #2E3548; --s7i: #CDD4E4; --s8: #4A4210; --s8i: #F2E48A; --s9: #173F42; --s9i: #A5E3E6;
+  color-scheme: dark;
+}}
+:root[data-theme="dark"] {
+  --brand: #6F8DF5; --brand-600: #8AA2F7; --brand-700: #A9BBFA; --brand-50: #18203A; --brand-100: #1E2A4D; --brand-200: #2E3F75;
+  --bg: #0C111D; --surface: #141B2B; --surface-2: #1A2336; --line: #273149; --line-strong: #34405C;
+  --text: #EDF1FA; --text-2: #B3BCD2; --text-3: #8791AB;
+  --ok: #4FD69C; --ok-bg: #0F2A20; --warn: #F5B84C; --warn-bg: #2E2410; --err: #FF8A80; --err-bg: #331615;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.25); --shadow-lg: 0 16px 40px rgba(0,0,0,.4);
+  --s0: #22336E; --s0i: #BFD0FF; --s1: #11443A; --s1i: #9BEBD3; --s2: #4A3410; --s2i: #FFD89A;
+  --s3: #52202E; --s3i: #FFB8C8; --s4: #2C4414; --s4i: #C9EE9F; --s5: #113F55; --s5i: #A8DDF5;
+  --s6: #52291A; --s6i: #FFC2A6; --s7: #2E3548; --s7i: #CDD4E4; --s8: #4A4210; --s8i: #F2E48A; --s9: #173F42; --s9i: #A5E3E6;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { font-size: 17px; }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: Inter, "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif; line-height: 1.5; overflow-x: hidden; }
+h1, h2, h3, .display { font-family: "Plus Jakarta Sans", "Segoe UI", system-ui, sans-serif; letter-spacing: -0.01em; margin: 0; }
+.mono { font-family: "JetBrains Mono", ui-monospace, Consolas, "Courier New", monospace; font-variant-numeric: tabular-nums; }
+button, input, select { font: inherit; color: inherit; }
+.wrap { max-width: 1320px; margin: 0 auto; padding: 0 24px; }
+
+/* Top bar */
+.topbar { background: var(--surface); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 20; }
+.topbar .wrap { display: flex; align-items: center; gap: 16px; height: 68px; }
+.logo { display: flex; align-items: center; gap: 12px; font-weight: 800; font-family: "Plus Jakarta Sans", sans-serif; font-size: 1.05rem; }
+.logo-mark { width: 36px; height: 36px; border-radius: 10px; background: var(--brand); display: grid; grid-template-columns: 1fr 1fr; gap: 3px; padding: 8px; }
+.logo-mark i { background: #fff; border-radius: 2px; }
+.logo-mark i:nth-child(2), .logo-mark i:nth-child(3) { opacity: .5; }
+.logo small { display: block; font-weight: 600; color: var(--text-3); font-size: .78rem; font-family: Inter, sans-serif; letter-spacing: 0; }
+.spacer { flex: 1; }
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 999px; font-size: .8rem; font-weight: 600; background: var(--brand-50); color: var(--brand); border: 1px solid var(--brand-100); }
+.icon-btn { width: 42px; height: 42px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); display: grid; place-items: center; cursor: pointer; }
+.icon-btn:hover { background: var(--surface-2); }
+.icon-btn svg { width: 20px; height: 20px; }
+
+/* Hero */
+.hero { padding-top: 44px; padding-bottom: 28px; }
+.hero h1 { font-size: 2.5rem; font-weight: 800; line-height: 1.15; max-width: 20ch; }
+.hero h1 em { font-style: normal; color: var(--brand); }
+.hero p { color: var(--text-2); font-size: 1.1rem; max-width: 62ch; margin: 14px 0 0; }
+.rule { margin-top: 22px; display: inline-flex; align-items: center; gap: 14px; padding: 12px 18px 12px 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); }
+.rule-demo { display: grid; grid-template-columns: repeat(3, 22px); gap: 3px; }
+.rule-demo span { height: 16px; border-radius: 4px; }
+.rule b { display: block; font-size: .95rem; }
+.rule small { color: var(--text-3); font-size: .85rem; }
+
+/* Steps */
+.steps { display: grid; grid-template-columns: 1fr 1.35fr; gap: 22px; align-items: start; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+.card-h { display: flex; align-items: center; gap: 14px; padding: 20px 22px 0; }
+.step-no { width: 34px; height: 34px; flex: none; border-radius: 50%; background: var(--brand); color: #fff; display: grid; place-items: center; font-weight: 700; font-family: "Plus Jakarta Sans", sans-serif; }
+.step-no.done { background: var(--ok); }
+.card-h h2 { font-size: 1.25rem; }
+.card-h p { margin: 0; color: var(--text-3); font-size: .9rem; }
+.card-b { padding: 18px 22px 22px; }
+
+.drop { display: block; border: 2px dashed var(--line-strong); border-radius: 12px; padding: 26px 18px; text-align: center; cursor: pointer; transition: border-color .15s, background .15s; background: var(--surface-2); }
+.drop:hover, .drop.over { border-color: var(--brand); background: var(--brand-50); }
+.drop svg { width: 40px; height: 40px; color: var(--brand); }
+.drop b { display: block; font-size: 1.05rem; margin-top: 6px; }
+.drop span { color: var(--text-3); font-size: .9rem; }
+.row-btns { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 16px; border-radius: 10px; border: 1px solid var(--line-strong); background: var(--surface); font-weight: 600; font-size: .95rem; cursor: pointer; text-decoration: none; color: var(--text); transition: background .12s, transform .06s; }
+.btn:hover { background: var(--surface-2); }
+.btn:active { transform: translateY(1px); }
+.btn svg { width: 18px; height: 18px; flex: none; }
+.btn.primary { background: var(--brand); border-color: var(--brand); color: #fff; }
+.btn.primary:hover { background: var(--brand-600); }
+:root[data-theme="dark"] .btn.primary, :root[data-theme="dark"] .step-no { color: #0C111D; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .btn.primary, :root:not([data-theme="light"]) .step-no { color: #0C111D; } }
+.btn.big { padding: 16px 26px; font-size: 1.1rem; border-radius: 12px; }
+.btn.ghost { border-color: transparent; background: transparent; color: var(--brand); }
+.btn.ghost:hover { background: var(--brand-50); }
+.btn.sm { padding: 6px 10px; font-size: .85rem; }
+
+.source { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; margin-top: 14px; background: var(--surface); }
+.source .ficon { width: 40px; height: 40px; border-radius: 9px; background: var(--ok-bg); color: var(--ok); display: grid; place-items: center; flex: none; }
+.source .ficon svg { width: 22px; height: 22px; }
+.source b { display: block; font-size: .95rem; word-break: break-all; }
+.source small { color: var(--text-3); }
+
+.kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+.kpi { background: var(--surface-2); border-radius: 10px; padding: 10px 12px; }
+.kpi b { font-size: 1.5rem; font-family: "Plus Jakarta Sans", sans-serif; display: block; line-height: 1.2; }
+.kpi span { color: var(--text-3); font-size: .82rem; }
+
+.subjects { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.chip { display: inline-flex; align-items: center; gap: 8px; padding: 5px 10px 5px 6px; border-radius: 8px; font-size: .87rem; font-weight: 600; border: 1px solid transparent; }
+.chip .code { font-family: "JetBrains Mono", monospace; font-size: .72rem; padding: 2px 5px; border-radius: 4px; background: rgba(255,255,255,.55); }
+:root[data-theme="dark"] .chip .code { background: rgba(0,0,0,.25); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .chip .code { background: rgba(0,0,0,.25); } }
+.chip .n { opacity: .75; font-weight: 500; }
+
+.notes { margin-top: 14px; display: grid; gap: 8px; }
+.note { display: flex; gap: 10px; padding: 10px 12px; border-radius: 10px; font-size: .9rem; align-items: flex-start; }
+.note svg { width: 18px; height: 18px; flex: none; margin-top: 2px; }
+.note.ok { background: var(--ok-bg); color: var(--ok); }
+.note.warn { background: var(--warn-bg); color: var(--warn); }
+.note.err { background: var(--err-bg); color: var(--err); }
+.note span { color: var(--text); }
+
+/* Halls */
+.exam-meta { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+label.f { display: grid; gap: 4px; font-size: .82rem; font-weight: 600; color: var(--text-2); }
+.inp { width: 100%; padding: 9px 11px; border: 1px solid var(--line-strong); border-radius: 9px; background: var(--surface); min-width: 0; }
+.inp:focus { outline: 2px solid var(--brand); outline-offset: -1px; border-color: var(--brand); }
+.halls-tbl { width: 100%; border-collapse: separate; border-spacing: 0; }
+.halls-tbl th { text-align: left; font-size: .78rem; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: .04em; padding: 0 6px 8px; }
+.halls-tbl td { padding: 5px 6px; border-top: 1px solid var(--line); }
+.halls-tbl td.num input { width: 70px; text-align: center; }
+.halls-tbl .cap { font-weight: 700; font-family: "JetBrains Mono", monospace; }
+.halls-tbl .mini { display: inline-grid; gap: 2px; vertical-align: middle; margin-left: 8px; }
+.halls-tbl .mini i { width: 6px; height: 4px; background: var(--brand-200); border-radius: 1px; }
+.x-btn { border: 0; background: transparent; color: var(--text-3); cursor: pointer; width: 34px; height: 34px; border-radius: 8px; display: grid; place-items: center; }
+.x-btn:hover { background: var(--err-bg); color: var(--err); }
+.x-btn svg { width: 18px; height: 18px; }
+.tbl-scroll { overflow-x: auto; }
+
+.capbar { margin-top: 16px; padding: 14px 16px; border-radius: 12px; background: var(--surface-2); }
+.capbar-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; font-size: .95rem; }
+.capbar-top b { font-family: "Plus Jakarta Sans", sans-serif; }
+.meter { height: 10px; border-radius: 99px; background: var(--line); margin-top: 10px; overflow: hidden; }
+.meter i { display: block; height: 100%; border-radius: 99px; background: var(--brand); transition: width .4s ease; }
+.meter.over i { background: var(--err); }
+.cap-msg { margin-top: 8px; font-size: .9rem; font-weight: 600; }
+.cap-msg.ok { color: var(--ok); } .cap-msg.err { color: var(--err); }
+
+.gen { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-top: 18px; }
+.toggle { display: inline-flex; align-items: center; gap: 10px; font-size: .92rem; cursor: pointer; user-select: none; }
+.toggle input { display: none; }
+.toggle .tr { width: 42px; height: 24px; border-radius: 99px; background: var(--line-strong); position: relative; transition: background .15s; }
+.toggle .tr::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: transform .15s; box-shadow: 0 1px 2px rgba(0,0,0,.2); }
+.toggle input:checked + .tr { background: var(--brand); }
+.toggle input:checked + .tr::after { transform: translateX(18px); }
+
+/* Results */
+#results { padding: 36px 0 20px; scroll-margin-top: 80px; }
+.res-head { display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
+.res-head h2 { font-size: 1.8rem; font-weight: 800; }
+.res-head p { margin: 4px 0 0; color: var(--text-2); }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 18px; }
+.stat { padding: 16px 18px; }
+.stat span { color: var(--text-3); font-size: .88rem; font-weight: 500; }
+.stat b { display: block; font-size: 2.1rem; font-family: "Plus Jakarta Sans", sans-serif; font-weight: 800; line-height: 1.15; margin-top: 2px; }
+.stat small { color: var(--text-3); font-size: .82rem; }
+.stat.good { background: var(--ok-bg); border-color: transparent; }
+.stat.good b, .stat.good span { color: var(--ok); }
+.stat.bad { background: var(--err-bg); border-color: transparent; }
+.stat.bad b, .stat.bad span { color: var(--err); }
+.stat .tick { display: inline-flex; width: 34px; height: 34px; border-radius: 50%; background: var(--ok); color: var(--surface); align-items: center; justify-content: center; vertical-align: middle; margin-left: 8px; }
+.stat .tick svg { width: 20px; height: 20px; }
+.stat.good .tick { color: var(--surface); }
+
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 14px; }
+.search { position: relative; }
+.search input { padding-left: 38px; width: 340px; }
+.tb-label { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; color: var(--text-3); font-size: .9rem; margin-right: 2px; }
+.tb-label svg { width: 18px; height: 18px; }
+.search svg { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: var(--text-3); }
+.search-msg { font-size: .88rem; color: var(--text-2); }
+
+.tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 14px; }
+.tab { flex: none; padding: 10px 16px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; font-weight: 600; text-align: left; }
+.tab small { display: block; font-weight: 500; color: var(--text-3); font-size: .8rem; }
+.tab[aria-selected="true"] { background: var(--brand); border-color: var(--brand); color: #fff; }
+.tab[aria-selected="true"] small { color: rgba(255,255,255,.8); }
+:root[data-theme="dark"] .tab[aria-selected="true"], :root[data-theme="dark"] .tab[aria-selected="true"] small { color: #0C111D; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tab[aria-selected="true"], :root:not([data-theme="light"]) .tab[aria-selected="true"] small { color: #0C111D; } }
+
+.hall-card { padding: 22px; }
+.hall-top { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 16px; }
+.hall-top h3 { font-size: 1.4rem; }
+.hall-top .meta { color: var(--text-3); font-size: .92rem; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.hall-scroll { overflow-x: auto; padding-bottom: 6px; }
+.room { display: inline-block; min-width: 100%; }
+.board { margin: 0 auto 22px; text-align: center; padding: 10px; border-radius: 8px; background: var(--text); color: var(--surface); font-weight: 700; letter-spacing: .14em; font-size: .85rem; font-family: "Plus Jakarta Sans", sans-serif; }
+.grid { display: grid; gap: 14px 22px; justify-content: center; align-items: center; }
+.rlabel { font-size: .78rem; font-weight: 700; color: var(--text-3); text-align: right; white-space: nowrap; }
+.clabel { font-size: .74rem; font-weight: 600; color: var(--text-3); text-align: center; text-transform: uppercase; letter-spacing: .06em; }
+.bench { display: flex; gap: 4px; padding: 4px; border-radius: 11px; background: var(--surface-2); border: 1px solid var(--line); border-bottom-width: 4px; }
+.seat { width: 94px; height: 60px; border-radius: 8px; position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: default; overflow: hidden; border: 1.5px solid transparent; animation: pop .4s cubic-bezier(.2,.9,.3,1.3) backwards; }
+.seat .reg { font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: .86rem; position: relative; }
+.seat .sc { font-size: .7rem; font-weight: 700; letter-spacing: .06em; position: relative; opacity: .85; }
+.seat.empty { background: transparent; border: 1.5px dashed var(--line-strong); color: var(--text-3); animation: none; }
+.seat.empty .sc { font-weight: 500; letter-spacing: 0; }
+.seat.hit { outline: 3px solid var(--text); outline-offset: 2px; animation: pulse 1s ease 3; z-index: 2; }
+.seat.dim { opacity: .4; filter: saturate(.4); }
+@keyframes pop { from { opacity: 0; transform: scale(.6); } }
+@keyframes pulse { 50% { transform: scale(1.12); } }
+/* pattern overlay so subjects still read in black & white */
+.pat::before { content: ""; position: absolute; inset: 0; opacity: .16; pointer-events: none; }
+.p1::before { background: repeating-linear-gradient(45deg, currentColor 0 2px, transparent 2px 8px); }
+.p2::before { background: radial-gradient(currentColor 1.2px, transparent 1.4px) 0 0/7px 7px; }
+.p3::before { background: repeating-linear-gradient(0deg, currentColor 0 2px, transparent 2px 7px); }
+.p4::before { background: repeating-linear-gradient(-45deg, currentColor 0 2px, transparent 2px 8px); }
+.p5::before { background: repeating-linear-gradient(90deg, currentColor 0 2px, transparent 2px 7px); }
+.p6::before { background: repeating-linear-gradient(45deg, currentColor 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, currentColor 0 1px, transparent 1px 6px); }
+.p7::before { background: radial-gradient(currentColor 2px, transparent 2.2px) 0 0/10px 10px; }
+.p8::before { background: repeating-linear-gradient(0deg, currentColor 0 1px, transparent 1px 6px), repeating-linear-gradient(90deg, currentColor 0 1px, transparent 1px 6px); }
+.p9::before { background: repeating-linear-gradient(30deg, currentColor 0 3px, transparent 3px 10px); }
+
+.back { text-align: center; margin-top: 18px; color: var(--text-3); font-size: .8rem; letter-spacing: .14em; font-weight: 600; }
+
+.tip { position: fixed; z-index: 50; pointer-events: none; background: var(--text); color: var(--surface); padding: 10px 12px; border-radius: 10px; font-size: .88rem; box-shadow: var(--shadow-lg); opacity: 0; transition: opacity .1s; max-width: 280px; }
+.tip b { display: block; font-size: .98rem; }
+.tip .mono { opacity: .8; }
+
+.empty-state { text-align: center; padding: 50px 20px; color: var(--text-3); }
+.empty-state svg { width: 56px; height: 56px; color: var(--brand-200); }
+.empty-state b { display: block; color: var(--text); font-size: 1.15rem; margin: 8px 0 4px; }
+
+.problems { margin-bottom: 18px; }
+
+footer { margin-top: 40px; border-top: 1px solid var(--line); background: var(--surface); }
+footer .wrap { display: flex; gap: 16px; align-items: center; padding-top: 20px; padding-bottom: 20px; flex-wrap: wrap; color: var(--text-2); font-size: .92rem; }
+footer .lock { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; color: var(--ok); }
+footer .lock svg { width: 18px; height: 18px; }
+
+/* Mapping dialog */
+dialog { border: 0; border-radius: 16px; padding: 0; width: min(560px, calc(100vw - 32px)); background: var(--surface); color: var(--text); box-shadow: var(--shadow-lg); }
+dialog::backdrop { background: rgba(12,17,29,.55); }
+dialog .dh { padding: 22px 24px 8px; }
+dialog .dh h3 { font-size: 1.25rem; }
+dialog .dh p { color: var(--text-2); margin: 6px 0 0; font-size: .95rem; }
+dialog .db { padding: 12px 24px; display: grid; gap: 12px; }
+dialog .df { padding: 14px 24px 22px; display: flex; justify-content: flex-end; gap: 10px; }
+
+.toast { position: fixed; left: 50%; bottom: 28px; transform: translate(-50%, 20px); background: var(--text); color: var(--surface); padding: 12px 18px; border-radius: 12px; font-weight: 600; opacity: 0; transition: all .25s; z-index: 60; box-shadow: var(--shadow-lg); pointer-events: none; }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+.overlay { position: fixed; inset: 0; background: rgba(12,17,29,.55); display: none; place-items: center; z-index: 70; }
+.overlay.show { display: grid; }
+.overlay .box { background: var(--surface); padding: 28px 34px; border-radius: 16px; text-align: center; box-shadow: var(--shadow-lg); min-width: 300px; }
+.overlay .box b { display: block; font-size: 1.15rem; margin-top: 14px; font-family: "Plus Jakarta Sans", sans-serif; }
+.overlay .box small { color: var(--text-3); }
+.spin { width: 64px; height: 64px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.spin i { border-radius: 3px; background: var(--brand); animation: blink 1s infinite; }
+@keyframes blink { 0%, 100% { opacity: .15; } 50% { opacity: 1; } }
+
+#print-area { display: none; }
+
+@media (max-width: 1000px) {
+  .steps { grid-template-columns: 1fr; }
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .hero h1 { font-size: 2rem; }
+}
+@media (max-width: 640px) {
+  html { font-size: 15px; }
+  .wrap { padding: 0 16px; }
+  .exam-meta { grid-template-columns: 1fr 1fr; }
+  .exam-meta label:first-child { grid-column: 1 / -1; }
+  .search input { width: 100%; }
+  .search { flex: 1 1 100%; }
+  .topbar .pill { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .seat, .seat.hit { animation: none; } }
+
+/* ---------- PRINT ---------- */
+@media print {
+  @page { size: A4 portrait; margin: 12mm; }
+  @page landscape { size: A4 landscape; margin: 10mm; }
+  html { font-size: 11pt; }
+  body { background: #fff !important; color: #000 !important; }
+  body > *:not(#print-area) { display: none !important; }
+  #print-area { display: block !important; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .pg { page-break-after: always; break-after: page; color: #000; }
+  .pg:last-child { page-break-after: auto; break-after: auto; }
+  .pg.land { page: landscape; }
+  .ph { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 10px; }
+  .ph h1 { font-size: 16pt; }
+  .ph .r { text-align: right; font-size: 9.5pt; }
+  .pg .board { background: #000 !important; color: #fff !important; margin-bottom: 8px; padding: 4px; }
+  .pg .grid { gap: 5px 14px; }
+  .pg .rlabel, .pg .clabel { font-size: 8pt; }
+  .pg .back { margin-top: 6px; font-size: 7pt; }
+  .pg .bench { padding: 2px; gap: 3px; border-bottom-width: 2px; }
+  .pg .bench { background: #fff !important; border-color: #888; }
+  .pg .seat { width: 92px; height: 44px; animation: none; border: 1px solid #555; }
+  .pg .seat.empty { border: 1px dashed #999; }
+  .pg .seat .reg { font-size: 9pt; }
+  .pg .seat .sc { font-size: 7pt; }
+  .pg .seat .loc { font-size: 6.5pt; opacity: .8; font-family: "JetBrains Mono", monospace; position: relative; }
+  .pg .legend { margin: 10px 0 0; }
+  .pg .chip { border: 1px solid #555; }
+  .door h1 { font-size: 34pt; text-align: center; margin-top: 4mm; }
+  .door .sub { text-align: center; font-size: 13pt; margin: 2mm 0 6mm; }
+  .door .regs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3mm 5mm; }
+  .door .regs div { font-family: "JetBrains Mono", monospace; font-size: 20pt; font-weight: 700; text-align: center; border: 1.5px solid #000; border-radius: 3mm; padding: 1.5mm 0; }
+  .door .range { text-align: center; font-size: 14pt; margin-top: 6mm; font-weight: 700; }
+  table.pt { width: 100%; border-collapse: collapse; font-size: 9.5pt; }
+  table.pt th, table.pt td { border: 1px solid #000; padding: 4px 6px; text-align: left; }
+  table.pt th { background: #e8e8e8 !important; }
+  table.pt thead { display: table-header-group; }
+  table.pt tr { page-break-inside: avoid; break-inside: avoid; }
+  table.pt td.sig { width: 32mm; }
+  .signs { display: flex; justify-content: space-between; margin-top: 18mm; page-break-inside: avoid; }
+  .signs div { width: 60mm; border-top: 1px solid #000; text-align: center; padding-top: 4px; font-size: 10pt; }
+  .pfoot { margin-top: 6px; font-size: 8pt; color: #444; }
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="logo">
+      <div class="logo-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      <div>Exam Hall Planner<small>by Coyot AI</small></div>
+    </div>
+    <div class="spacer"></div>
+    <span class="pill">Higher Secondary · Plus One &amp; Plus Two</span>
+    <button class="icon-btn" id="themeBtn" title="Switch light / dark" aria-label="Switch light or dark mode">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main>
+  <section class="hero wrap">
+    <h1>Exam seating that used to take a day, <em>done in seconds.</em></h1>
+    <p>Upload your student list, tell us your halls, and get printable seating charts, door notices and attendance sheets — with no two students of the same paper sitting together.</p>
+    <div class="rule">
+      <div class="rule-demo" aria-hidden="true">
+        <span style="background:var(--s0)"></span><span style="background:var(--s1)"></span><span style="background:var(--s0)"></span>
+        <span style="background:var(--s1)"></span><span style="background:var(--s2)"></span><span style="background:var(--s1)"></span>
+        <span style="background:var(--s0)"></span><span style="background:var(--s1)"></span><span style="background:var(--s0)"></span>
+      </div>
+      <div><b>The seating rule</b><small>Same subject never beside, in front of, or behind each other.</small></div>
+    </div>
+  </section>
+
+  <section class="wrap steps">
+    <!-- STEP 1 -->
+    <div class="card">
+      <div class="card-h"><div class="step-no" id="s1no">1</div><div><h2>Student list</h2><p>Excel or CSV — one row per student</p></div></div>
+      <div class="card-b">
+        <label class="drop" id="drop">
+          <input type="file" id="file" accept=".csv,.xlsx,.xls" multiple hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M12 17v-6"/><path d="m9 13 3-3 3 3"/></svg>
+          <b>Drop your Excel or CSV file here</b>
+          <span>or click to choose · you can select several class files at once</span>
+        </label>
+        <div class="row-btns">
+          <button class="btn primary" id="demoBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l14 9-14 9z"/></svg>Use demo data</button>
+          <a class="btn" href="sample-data/exam-demo-data.xlsx" download><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>Sample Excel</a>
+          <a class="btn" href="sample-data/students-demo.csv" download><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>Sample CSV</a>
+        </div>
+        <div id="studentSummary"></div>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="card">
+      <div class="card-h"><div class="step-no" id="s2no">2</div><div><h2>Exam &amp; halls</h2><p>Halls are filled in the order listed</p></div></div>
+      <div class="card-b">
+        <div class="exam-meta">
+          <label class="f">Exam name<input class="inp" id="examName" value="Higher Secondary First Terminal Examination"></label>
+          <label class="f">Date<input class="inp" id="examDate" type="date"></label>
+          <label class="f">Session<select class="inp" id="examSession"><option>Forenoon (FN)</option><option>Afternoon (AN)</option></select></label>
+        </div>
+        <div class="tbl-scroll">
+          <table class="halls-tbl">
+            <thead><tr><th>Hall</th><th>Rows</th><th>Benches / row</th><th>Per bench</th><th>Seats</th><th></th></tr></thead>
+            <tbody id="hallRows"></tbody>
+          </table>
+        </div>
+        <button class="btn ghost sm" id="addHall" style="margin-top:8px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Add hall</button>
+        <div class="capbar" id="capbar"></div>
+        <div class="gen">
+          <button class="btn primary big" id="genBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="7" height="6" rx="1.5"/><rect x="14" y="4" width="7" height="6" rx="1.5"/><rect x="3" y="14" width="7" height="6" rx="1.5"/><rect x="14" y="14" width="7" height="6" rx="1.5"/></svg>Generate seating plan</button>
+          <label class="toggle"><input type="checkbox" id="evenly" checked><span class="tr"></span>Fill halls evenly</label>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap" id="results">
+    <div class="card empty-state" id="resultsEmpty">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="7" height="6" rx="1.5"/><rect x="14" y="4" width="7" height="6" rx="1.5"/><rect x="3" y="14" width="7" height="6" rx="1.5"/><rect x="14" y="14" width="7" height="6" rx="1.5"/></svg>
+      <b>Your seating plan will appear here</b>
+      Load the demo data or upload a file, then press <b style="display:inline">Generate seating plan</b>.
+    </div>
+    <div id="resultsBody" hidden></div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Student data never leaves this computer</span>
+    <span>Everything runs inside your browser. Nothing is uploaded to any server.</span>
+    <div class="spacer"></div>
+    <span>Demo by <b>Coyot AI</b></span>
+  </div>
+</footer>
+
+<dialog id="mapDlg">
+  <form method="dialog">
+    <div class="dh"><h3>Which column is which?</h3><p id="mapInfo">Your file's headings are a little different. Just tell us which column holds each item.</p></div>
+    <div class="db" id="mapBody"></div>
+    <div class="df"><button class="btn" value="cancel">Cancel</button><button class="btn primary" value="ok" id="mapOk">Use these columns</button></div>
+  </form>
+</dialog>
+
+<div class="tip" id="tip"></div>
+<div class="toast" id="toast"></div>
+<div class="overlay" id="overlay"><div class="box"><div class="spin"><i></i><i style="animation-delay:.1s"></i><i style="animation-delay:.2s"></i><i style="animation-delay:.3s"></i><i style="animation-delay:.7s"></i><i style="animation-delay:.6s"></i><i style="animation-delay:.5s"></i><i style="animation-delay:.4s"></i><i style="animation-delay:.8s"></i><i style="animation-delay:.9s"></i><i style="animation-delay:1s"></i><i style="animation-delay:1.1s"></i><i style="animation-delay:.5s"></i><i style="animation-delay:.3s"></i><i style="animation-delay:.1s"></i><i style="animation-delay:0s"></i></div><b id="ovMsg">Arranging seats…</b><small id="ovSub">Checking every neighbour</small></div></div>
+<div id="print-area"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="engine.js"></script>
+<script src="demo-data.js"></script>
+<script>
+(function () {
+  const $ = s => document.querySelector(s);
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const store = {
+    get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  };
+
+  const state = { students: [], halls: [], source: null, notes: [], seed: 1, result: null, current: 0, subjects: [] };
+
+  /* ---------- Theme ---------- */
+  const savedTheme = store.get('ehp-theme');
+  if (savedTheme) document.documentElement.dataset.theme = savedTheme;
+  $('#themeBtn').onclick = () => {
+    const dark = document.documentElement.dataset.theme ? document.documentElement.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.dataset.theme = dark ? 'light' : 'dark';
+    store.set('ehp-theme', document.documentElement.dataset.theme);
+  };
+
+  $('#examDate').value = new Date().toISOString().slice(0, 10);
+
+  function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), 2600); }
+
+  /* ---------- Subjects: colour slot, pattern, short code ---------- */
+  const CODES = { physics: 'PHY', chemistry: 'CHE', biology: 'BIO', mathematics: 'MAT', maths: 'MAT', 'computer science': 'CS', 'computer application': 'CA', accountancy: 'ACC', 'business studies': 'BST', economics: 'ECO', statistics: 'STA', history: 'HIS', 'political science': 'POL', sociology: 'SOC', geography: 'GEO', psychology: 'PSY', english: 'ENG', malayalam: 'MAL', hindi: 'HIN', arabic: 'ARB', sanskrit: 'SAN', 'islamic history': 'ISH', 'gandhian studies': 'GAN', 'social work': 'SW' };
+  function codeFor(name) {
+    const k = SeatEngine.subjectKey(name);
+    if (CODES[k]) return CODES[k];
+    const w = k.split(' ');
+    return (w.length > 1 ? w.map(x => x[0]).join('') : k.slice(0, 3)).toUpperCase();
+  }
+  function subjectInfo(name) {
+    const k = SeatEngine.subjectKey(name);
+    const i = state.subjects.findIndex(s => s.key === k);
+    return state.subjects[i] ? { ...state.subjects[i], slot: i % 10 } : { key: k, name, code: codeFor(name), slot: 7 };
+  }
+  const chipStyle = slot => `background:var(--s${slot});color:var(--s${slot}i)`;
+
+  /* ---------- Students ---------- */
+  function setStudents(list, source, notes) {
+    // Build subject catalogue (largest first) and normalise names.
+    const map = new Map();
+    for (const s of list) {
+      const k = SeatEngine.subjectKey(s.subject);
+      if (!map.has(k)) map.set(k, { key: k, name: s.subject.trim().replace(/\s+/g, ' '), code: codeFor(s.subject), count: 0, variants: new Set() });
+      const e = map.get(k); e.count++; e.variants.add(s.subject);
+    }
+    for (const e of map.values()) {
+      if (e.name === e.name.toLowerCase() || e.name === e.name.toUpperCase()) e.name = e.name.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+      if (e.variants.size > 1) notes.push({ t: 'warn', m: `Merged different spellings into <b>${esc(e.name)}</b>: ${[...e.variants].map(v => '“' + esc(v) + '”').join(', ')}` });
+    }
+    state.subjects = [...map.values()].sort((a, b) => b.count - a.count);
+    for (const s of list) s.subject = map.get(SeatEngine.subjectKey(s.subject)).name;
+    state.students = list;
+    state.source = source;
+    state.notes = notes;
+    state.result = null;
+    renderStudents();
+    renderCap();
+  }
+
+  function renderStudents() {
+    const el = $('#studentSummary');
+    if (!state.students.length) { el.innerHTML = ''; $('#s1no').classList.remove('done'); $('#s1no').textContent = '1'; return; }
+    $('#s1no').classList.add('done'); $('#s1no').innerHTML = '&#10003;';
+    const classes = new Set(state.students.map(s => s.cls).filter(Boolean));
+    const big = state.subjects[0];
+    const share = big ? big.count / state.students.length : 0;
+    const notes = state.notes.slice();
+    if (share > 0.5) notes.push({ t: 'err', m: `<b>${esc(big.name)}</b> is ${Math.round(share * 100)}% of all students. When one paper is more than half, some seats must stay empty to keep them apart — add a hall or mix in another paper.` });
+    const icon = { ok: '<path d="M20 6 9 17l-5-5"/>', warn: '<path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/>', err: '<circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/>' };
+    el.innerHTML = `
+      <div class="source">
+        <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="m9 15 2 2 4-4"/></svg></div>
+        <div style="flex:1;min-width:0"><b>${esc(state.source)}</b><small>Loaded and checked</small></div>
+        <button class="x-btn" id="clearStudents" title="Remove" aria-label="Remove student list"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+      </div>
+      <div class="kpis">
+        <div class="kpi"><b>${state.students.length}</b><span>Students</span></div>
+        <div class="kpi"><b>${classes.size}</b><span>Classes</span></div>
+        <div class="kpi"><b>${state.subjects.length}</b><span>Subject papers</span></div>
+      </div>
+      <div class="subjects">${state.subjects.map((s, i) => `<span class="chip" style="${chipStyle(i % 10)}"><span class="code">${esc(s.code)}</span>${esc(s.name)} <span class="n">${s.count}</span></span>`).join('')}</div>
+      ${notes.length ? `<div class="notes">${notes.map(n => `<div class="note ${n.t}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${icon[n.t]}</svg><span>${n.m}</span></div>`).join('')}</div>` : ''}`;
+    $('#clearStudents').onclick = () => { state.students = []; state.subjects = []; state.result = null; renderStudents(); renderCap(); renderResults(); };
+  }
+
+  /* ---------- Halls ---------- */
+  function renderHalls() {
+    $('#hallRows').innerHTML = state.halls.map((h, i) => {
+      const cap = h.rows * h.benches * h.perBench;
+      return `<tr data-i="${i}">
+        <td><input class="inp" data-k="name" value="${esc(h.name)}" aria-label="Hall name"></td>
+        <td class="num"><input class="inp" data-k="rows" type="number" min="1" max="30" value="${h.rows}" aria-label="Rows"></td>
+        <td class="num"><input class="inp" data-k="benches" type="number" min="1" max="10" value="${h.benches}" aria-label="Benches per row"></td>
+        <td class="num"><select class="inp" data-k="perBench" aria-label="Students per bench">${[1, 2, 3].map(n => `<option ${n === h.perBench ? 'selected' : ''}>${n}</option>`).join('')}</select></td>
+        <td class="cap">${cap}</td>
+        <td><button class="x-btn" data-del="${i}" title="Remove hall" aria-label="Remove ${esc(h.name)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></button></td>
+      </tr>`;
+    }).join('');
+    renderCap();
+  }
+  $('#hallRows').addEventListener('input', e => {
+    const tr = e.target.closest('tr'); if (!tr) return;
+    const h = state.halls[+tr.dataset.i], k = e.target.dataset.k;
+    if (k === 'name') h.name = e.target.value;
+    else h[k] = Math.max(1, Math.min(k === 'rows' ? 30 : 10, parseInt(e.target.value, 10) || 1));
+    tr.querySelector('.cap').textContent = h.rows * h.benches * h.perBench;
+    renderCap();
+  });
+  $('#hallRows').addEventListener('click', e => {
+    const b = e.target.closest('[data-del]'); if (!b) return;
+    state.halls.splice(+b.dataset.del, 1); renderHalls();
+  });
+  $('#addHall').onclick = () => {
+    state.halls.push({ name: 'Hall ' + (state.halls.length + 1), rows: 6, benches: 3, perBench: 2 });
+    renderHalls();
+    const inputs = $('#hallRows').querySelectorAll('input[data-k="name"]'); inputs[inputs.length - 1].select();
+  };
+
+  function renderCap() {
+    const cap = state.halls.reduce((a, h) => a + h.rows * h.benches * h.perBench, 0);
+    const n = state.students.length;
+    const pct = cap ? Math.min(100, n / cap * 100) : (n ? 100 : 0);
+    let msg;
+    if (!n) msg = `<div class="cap-msg" style="color:var(--text-3)">Load a student list to check capacity.</div>`;
+    else if (n > cap) msg = `<div class="cap-msg err">Short by ${n - cap} seat${n - cap === 1 ? '' : 's'} — add a hall or increase rows.</div>`;
+    else msg = `<div class="cap-msg ok">Enough seats. ${cap - n} spare seat${cap - n === 1 ? '' : 's'} will help keep subjects apart.</div>`;
+    $('#capbar').innerHTML = `<div class="capbar-top"><span><b>${n}</b> students &nbsp;·&nbsp; <b>${cap}</b> seats in <b>${state.halls.length}</b> hall${state.halls.length === 1 ? '' : 's'}</span><span>${cap ? Math.round(n / cap * 100) : 0}% full</span></div>
+      <div class="meter ${n > cap ? 'over' : ''}"><i style="width:${pct}%"></i></div>${msg}`;
+    const ok = n && cap >= n;
+    $('#s2no').classList.toggle('done', !!ok); $('#s2no').innerHTML = ok ? '&#10003;' : '2';
+  }
+
+  /* ---------- File upload ---------- */
+  const drop = $('#drop');
+  ['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
+  ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
+  drop.addEventListener('drop', e => handleFiles([...e.dataTransfer.files]));
+  $('#file').addEventListener('change', e => { handleFiles([...e.target.files]); e.target.value = ''; });
+
+  const FIELDS = [
+    { k: 'reg', label: 'Register No', req: true, re: /reg|roll|admission|adm\.?\s*no|^id$/i },
+    { k: 'name', label: 'Student Name', re: /name/i },
+    { k: 'cls', label: 'Class / Batch', re: /class|batch|division|div|course/i },
+    { k: 'subject', label: 'Subject (paper written)', req: true, re: /subject|paper|exam/i },
+    { k: 'stream', label: 'Stream', re: /stream|group/i }
+  ];
+
+  function readFile(f) {
+    return new Promise((res, rej) => {
+      const r = new FileReader();
+      const isCsv = /\.csv$/i.test(f.name);
+      r.onload = () => {
+        try {
+          const wb = isCsv ? XLSX.read(r.result, { type: 'string', raw: true }) : XLSX.read(new Uint8Array(r.result), { type: 'array' });
+          res(wb);
+        } catch (e) { rej(e); }
+      };
+      r.onerror = rej;
+      isCsv ? r.readAsText(f) : r.readAsArrayBuffer(f);
+    });
+  }
+
+  async function handleFiles(files) {
+    if (!files.length) return;
+    if (typeof XLSX === 'undefined') { toast('File reader could not load — check the internet connection, or use demo data.'); return; }
+    const all = []; let hallsFromFile = null;
+    for (const f of files) {
+      let wb;
+      try { wb = await readFile(f); } catch (e) { toast('Could not read ' + f.name); continue; }
+      for (const sn of wb.SheetNames) {
+        const rows = XLSX.utils.sheet_to_json(wb.Sheets[sn], { header: 1, defval: '', raw: false, blankrows: false });
+        if (!rows.length) continue;
+        const head = rows[0].map(h => String(h).trim());
+        // A "Halls" sheet sets up the halls too.
+        const hi = { name: head.findIndex(h => /hall|room/i.test(h)), rows: head.findIndex(h => /^rows?$/i.test(h)), benches: head.findIndex(h => /bench.*row|benches/i.test(h)), per: head.findIndex(h => /per bench|students per/i.test(h)) };
+        if (hi.name >= 0 && hi.rows >= 0 && hi.benches >= 0 && !head.some(h => /subject/i.test(h))) {
+          hallsFromFile = rows.slice(1).filter(r => String(r[hi.name]).trim()).map(r => ({
+            name: String(r[hi.name]).trim(), rows: parseInt(r[hi.rows], 10) || 6, benches: parseInt(r[hi.benches], 10) || 3,
+            perBench: Math.min(3, Math.max(1, parseInt(hi.per >= 0 ? r[hi.per] : 2, 10) || 2))
+          }));
+          continue;
+        }
+        all.push({ file: f.name + (wb.SheetNames.length > 1 ? ' › ' + sn : ''), head, rows: rows.slice(1) });
+      }
+    }
+    if (!all.length) { toast('No student rows found in that file.'); return; }
+    // Map columns using the first table's headings; ask if anything required is missing.
+    let mapping = autoMap(all[0].head);
+    if (FIELDS.some(f => f.req && mapping[f.k] < 0)) {
+      mapping = await askMapping(all[0].head, mapping, all[0].file);
+      if (!mapping) return;
+    }
+    const students = [], notes = [];
+    let blank = 0;
+    for (const t of all) {
+      const m = t === all[0] ? mapping : (() => { const a = autoMap(t.head); return FIELDS.every(f => !f.req || a[f.k] >= 0) ? a : mapping; })();
+      for (const r of t.rows) {
+        const get = k => m[k] >= 0 ? String(r[m[k]] == null ? '' : r[m[k]]).trim() : '';
+        const s = { reg: get('reg'), name: get('name'), cls: get('cls'), stream: get('stream'), subject: get('subject') };
+        if (!s.reg && !s.subject && !s.name) continue;
+        if (!s.reg || !s.subject) { blank++; continue; }
+        students.push(s);
+      }
+    }
+    // Duplicates
+    const seen = new Map(), dups = new Set();
+    for (const s of students) { if (seen.has(s.reg)) dups.add(s.reg); else seen.set(s.reg, s); }
+    if (dups.size) notes.push({ t: 'err', m: `Duplicate register numbers found (kept first entry only): <span class="mono">${[...dups].slice(0, 8).map(esc).join(', ')}${dups.size > 8 ? ' …' : ''}</span>` });
+    const unique = [...seen.values()];
+    if (blank) notes.push({ t: 'warn', m: `${blank} row${blank === 1 ? ' was' : 's were'} skipped because the register number or subject was blank.` });
+    if (hallsFromFile && hallsFromFile.length) { state.halls = hallsFromFile; renderHalls(); notes.push({ t: 'ok', m: `Hall list loaded from the file: ${hallsFromFile.length} halls.` }); }
+    if (!dups.size && !blank) notes.unshift({ t: 'ok', m: 'All rows look good — no duplicates or blanks.' });
+    const name = files.length === 1 ? files[0].name : `${files.length} files`;
+    setStudents(unique, name, notes);
+    toast(`${unique.length} students loaded`);
+  }
+
+  function autoMap(head) {
+    const m = {}; const used = new Set();
+    for (const f of FIELDS) {
+      m[f.k] = -1;
+      for (let i = 0; i < head.length; i++) if (!used.has(i) && f.re.test(head[i])) { m[f.k] = i; used.add(i); break; }
+    }
+    return m;
+  }
+
+  function askMapping(head, mapping, fname) {
+    return new Promise(resolve => {
+      const dlg = $('#mapDlg');
+      $('#mapInfo').innerHTML = `The headings in <b>${esc(fname)}</b> are a little different. Just tell us which column holds each item.`;
+      $('#mapBody').innerHTML = FIELDS.map(f => `<label class="f">${f.label}${f.req ? ' *' : ''}<select class="inp" data-k="${f.k}"><option value="-1">${f.req ? '— choose —' : '(not in file)'}</option>${head.map((h, i) => `<option value="${i}" ${mapping[f.k] === i ? 'selected' : ''}>${esc(h || 'Column ' + (i + 1))}</option>`).join('')}</select></label>`).join('');
+      dlg.onclose = () => {
+        if (dlg.returnValue !== 'ok') return resolve(null);
+        const m = {}; dlg.querySelectorAll('select[data-k]').forEach(s => m[s.dataset.k] = +s.value);
+        if (m.reg < 0 || m.subject < 0) { toast('Register No and Subject are needed'); return resolve(null); }
+        resolve(m);
+      };
+      dlg.showModal();
+    });
+  }
+
+  /* ---------- Demo ---------- */
+  $('#demoBtn').onclick = () => {
+    state.halls = DemoData.halls.map(h => ({ ...h })); renderHalls();
+    setStudents(DemoData.students.map(s => ({ ...s })), 'Demo data — 6 classes, Plus One & Plus Two', [
+      { t: 'ok', m: 'All rows look good — no duplicates or blanks.' },
+      { t: 'ok', m: '<b>Economics</b> is written by both Plus Two Commerce and Plus Two Humanities — treated as one paper, so they will be kept apart too.' }
+    ]);
+    toast('Demo data loaded — 240 students, 6 halls');
+  };
+
+  /* ---------- Generate ---------- */
+  $('#genBtn').onclick = () => generate(false);
+  function generate(reshuffle, instant) {
+    if (!state.students.length) { toast('Load a student list first — try “Use demo data”'); $('#demoBtn').focus(); return; }
+    if (!state.halls.length) { toast('Add at least one hall'); return; }
+    if (reshuffle) state.seed = (state.seed * 16807 + 7) % 2147483647 || 1;
+    if (instant) {
+      state.result = SeatEngine.allocate(state.students, state.halls, { seed: state.seed, evenly: $('#evenly').checked });
+      state.current = 0; renderResults(); return;
+    }
+    const ov = $('#overlay'); ov.classList.add('show');
+    const msgs = [['Arranging seats…', 'Checking every neighbour'], ['Separating subjects…', 'Left, right, front and back'], ['Almost done…', 'Preparing charts and lists']];
+    let mi = 0; const iv = setInterval(() => { mi = Math.min(mi + 1, 2); $('#ovMsg').textContent = msgs[mi][0]; $('#ovSub').textContent = msgs[mi][1]; }, 450);
+    $('#ovMsg').textContent = msgs[0][0]; $('#ovSub').textContent = msgs[0][1];
+    setTimeout(() => {
+      state.result = SeatEngine.allocate(state.students, state.halls, { seed: state.seed, evenly: $('#evenly').checked });
+      state.current = 0;
+      clearInterval(iv); ov.classList.remove('show');
+      renderResults();
+      $('#results').scrollIntoView({ behavior: 'smooth' });
+    }, 1300);
+  }
+
+  /* ---------- Results ---------- */
+  function renderResults() {
+    const r = state.result;
+    $('#resultsEmpty').hidden = !!r; $('#resultsBody').hidden = !r;
+    if (!r) return;
+    const seated = r.halls.reduce((a, h) => a + h.count, 0);
+    const used = r.halls.filter(h => h.count).length;
+    const empty = r.totalCapacity - seated;
+    const v = r.violations.length;
+    const tick = '<span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>';
+    let problems = '';
+    if (r.unplaced.length) {
+      const short = r.totalStudents - r.totalCapacity;
+      problems = `<div class="note err problems"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg><span><b>${r.unplaced.length} student${r.unplaced.length === 1 ? '' : 's'} could not be seated.</b> ${short > 0 ? `The halls are short by ${short} seats.` : 'Some seats had to stay empty to keep the same subject apart.'} Add a hall or increase the rows, then generate again. Not seated: <span class="mono">${r.unplaced.slice(0, 10).map(s => esc(s.reg)).join(', ')}${r.unplaced.length > 10 ? ' …' : ''}</span></span></div>`;
+    }
+    $('#resultsBody').innerHTML = `
+      <div class="res-head">
+        <div><h2>Seating plan ready</h2><p>${esc($('#examName').value)} · ${fmtDate($('#examDate').value)} · ${esc($('#examSession').value)}</p></div>
+        <div class="spacer"></div>
+        <button class="btn" id="reshuffle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M4 20 21 3"/><path d="M21 16v5h-5"/><path d="m15 15 6 6"/><path d="M4 4l5 5"/></svg>Reshuffle</button>
+      </div>
+      <div class="stats">
+        <div class="card stat"><span>Students seated</span><b>${seated}<small style="font-size:1rem;font-weight:600"> / ${r.totalStudents}</small></b></div>
+        <div class="card stat"><span>Halls used</span><b>${used}</b><small>${r.halls.map(h => h.count).join(' · ')} per hall</small></div>
+        <div class="card stat"><span>Empty seats</span><b>${empty}</b><small>of ${r.totalCapacity} seats</small></div>
+        <div class="card stat ${v ? 'bad' : 'good'}"><span>Same-subject neighbours</span><b>${v}${v ? '' : tick}</b><small style="color:inherit">${v ? 'Needs attention' : 'Checked every seat — all clear'}</small></div>
+      </div>
+      ${problems}
+      <div class="toolbar">
+        <span class="tb-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M6 14h12v7H6z"/></svg>Print</span>
+        <button class="btn" data-print="chart">Seating charts</button>
+        <button class="btn" data-print="door">Door notices</button>
+        <button class="btn" data-print="attend">Attendance sheets</button>
+        <button class="btn" data-print="master">Master list</button>
+        <div class="spacer"></div>
+        <button class="btn primary" id="dlCsv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>Download Excel list</button>
+      </div>
+      <div class="toolbar">
+        <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input class="inp mono" id="find" placeholder="Find register no. or name" aria-label="Find a student by register number or name"></div>
+        <span class="search-msg" id="findMsg"></span>
+      </div>
+      <div class="tabs" role="tablist" id="tabs">${r.halls.map((h, i) => `<button class="tab" role="tab" data-i="${i}" aria-selected="${i === state.current}">${esc(h.hall.name)}<small>${h.count} of ${h.capacity} seats</small></button>`).join('')}</div>
+      <div class="card hall-card" id="hallView"></div>`;
+    $('#reshuffle').onclick = () => generate(true);
+    $('#tabs').onclick = e => { const t = e.target.closest('.tab'); if (t) { state.current = +t.dataset.i; syncTabs(); renderHall(); } };
+    $('#resultsBody').querySelectorAll('[data-print]').forEach(b => b.onclick = () => printDoc(b.dataset.print));
+    $('#dlCsv').onclick = downloadCsv;
+    $('#find').oninput = findStudent;
+    renderHall();
+  }
+  function syncTabs() { $('#tabs').querySelectorAll('.tab').forEach((t, i) => t.setAttribute('aria-selected', i === state.current)); }
+
+  function seatHtml(s, i, forPrint) {
+    if (!s) return `<div class="seat empty"><span class="sc">empty</span></div>`;
+    const info = subjectInfo(s.subject);
+    return `<div class="seat pat p${info.slot}" data-reg="${esc(s.reg)}" style="${chipStyle(info.slot)};${forPrint ? '' : `animation-delay:${Math.min(i * 12, 900)}ms`}">
+      <span class="reg">${esc(s.reg)}</span><span class="sc">${esc(info.code)}</span>${forPrint ? `<span class="loc">${s.seat}</span>` : ''}</div>`;
+  }
+
+  function roomHtml(h, forPrint) {
+    const pb = h.hall.perBench, benches = h.hall.benches;
+    let html = `<div class="board">FRONT OF HALL — BLACKBOARD</div><div class="grid" style="grid-template-columns:auto repeat(${benches}, auto)"><div></div>`;
+    for (let b = 0; b < benches; b++) html += `<div class="clabel">Bench ${String.fromCharCode(65 + b)}</div>`;
+    let n = 0;
+    h.grid.forEach((row, r) => {
+      html += `<div class="rlabel">Row ${r + 1}</div>`;
+      for (let b = 0; b < benches; b++) {
+        html += `<div class="bench">`;
+        for (let k = 0; k < pb; k++) html += seatHtml(row[b * pb + k], n++, forPrint);
+        html += `</div>`;
+      }
+    });
+    return html + `</div><div class="back">BACK OF HALL</div>`;
+  }
+
+  function legendHtml(h) {
+    const counts = new Map();
+    h.grid.flat().filter(Boolean).forEach(s => counts.set(s.subject, (counts.get(s.subject) || 0) + 1));
+    return [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([name, c]) => { const i = subjectInfo(name); return `<span class="chip pat p${i.slot}" style="${chipStyle(i.slot)};position:relative"><span class="code">${esc(i.code)}</span>${esc(name)} <span class="n">${c}</span></span>`; }).join('');
+  }
+
+  function renderHall() {
+    const h = state.result.halls[state.current];
+    const classes = new Set(h.grid.flat().filter(Boolean).map(s => s.cls));
+    $('#hallView').innerHTML = `
+      <div class="hall-top"><h3>${esc(h.hall.name)}</h3><span class="meta">${h.count} candidates · ${h.hall.rows} rows × ${h.hall.benches} benches · ${h.hall.perBench} per bench · ${classes.size} classes mixed</span></div>
+      <div class="legend">${legendHtml(h)}</div>
+      <div class="hall-scroll"><div class="room">${roomHtml(h, false)}</div></div>`;
+    const q = $('#find') && $('#find').value.trim();
+    if (q) highlight(q, false);
+  }
+
+  /* Tooltip */
+  const tip = $('#tip');
+  document.addEventListener('mouseover', e => {
+    const el = e.target.closest('.seat[data-reg]');
+    if (!el || !state.result) { tip.style.opacity = 0; return; }
+    const s = state.students.find(x => x.reg === el.dataset.reg); if (!s) return;
+    const seat = state.result.halls[state.current].grid.flat().find(x => x && x.reg === s.reg);
+    tip.innerHTML = `<b>${esc(s.name || s.reg)}</b><span class="mono">${esc(s.reg)}</span> · ${esc(s.cls)}<br>${esc(s.subject)} · Seat <span class="mono">${seat ? seat.seat : ''}</span>`;
+    const r = el.getBoundingClientRect();
+    tip.style.left = Math.min(window.innerWidth - 290, Math.max(8, r.left)) + 'px';
+    tip.style.top = (r.bottom + 8 + 80 > window.innerHeight ? r.top - 84 : r.bottom + 8) + 'px';
+    tip.style.opacity = 1;
+  });
+
+  /* Search */
+  function findStudent(e) { highlight(e.target.value.trim(), true); }
+  function highlight(q, jump) {
+    const msg = $('#findMsg');
+    document.querySelectorAll('.seat.hit, .seat.dim').forEach(s => s.classList.remove('hit', 'dim'));
+    if (!q) { msg.textContent = ''; return; }
+    const ql = q.toLowerCase();
+    for (let hi = 0; hi < state.result.halls.length; hi++) {
+      const s = state.result.halls[hi].grid.flat().find(x => x && (x.reg.toLowerCase() === ql || (ql.length > 3 && x.name.toLowerCase().includes(ql))));
+      if (s) {
+        if (jump && hi !== state.current) { state.current = hi; syncTabs(); renderHall(); return; }
+        msg.innerHTML = `<b>${esc(s.name)}</b> → ${esc(state.result.halls[hi].hall.name)}, Row ${s.row}, Bench ${String.fromCharCode(65 + Math.floor((s.col - 1) / state.result.halls[hi].hall.perBench))}, Seat <span class="mono">${s.seat}</span>`;
+        const el = document.querySelector(`.seat[data-reg="${CSS.escape(s.reg)}"]`);
+        if (el) { document.querySelectorAll('#hallView .seat').forEach(x => x !== el && x.classList.add('dim')); el.classList.add('hit'); el.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' }); }
+        return;
+      }
+    }
+    msg.textContent = q.length >= 4 ? 'Not found' : '';
+  }
+
+  /* ---------- Print ---------- */
+  function fmtDate(v) { if (!v) return ''; const d = new Date(v + 'T00:00'); return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }); }
+  function pageHead(title, hallName, count) {
+    return `<div class="ph"><div><h1>${esc(title)}</h1><div>${esc($('#examName').value)}</div></div><div class="r"><b>${esc(hallName)}</b><br>${fmtDate($('#examDate').value)} · ${esc($('#examSession').value)}<br>Candidates: ${count}</div></div>`;
+  }
+  function printDoc(kind, noDialog) {
+    const r = state.result, area = $('#print-area');
+    const halls = r.halls.filter(h => h.count);
+    const byReg = (a, b) => a.reg.localeCompare(b.reg, undefined, { numeric: true });
+    let html = '';
+    if (kind === 'chart') {
+      html = halls.map(h => `<section class="pg land">${pageHead('Hall Seating Chart', h.hall.name, h.count)}<div style="zoom:${Math.min(1, 8 / h.hall.rows, 5 / h.hall.benches).toFixed(3)}">${roomHtml(h, true)}</div><div class="legend">${legendHtml(h)}</div></section>`).join('');
+    } else if (kind === 'door') {
+      html = halls.map(h => { const list = h.grid.flat().filter(Boolean).sort(byReg); return `<section class="pg door"><h1>${esc(h.hall.name)}</h1><div class="sub">${esc($('#examName').value)}<br>${fmtDate($('#examDate').value)} · ${esc($('#examSession').value)} · ${h.count} candidates</div><div class="regs">${list.map(s => `<div>${esc(s.reg)}</div>`).join('')}</div></section>`; }).join('');
+    } else if (kind === 'attend') {
+      html = halls.map(h => { const list = h.grid.flat().filter(Boolean).sort(byReg); return `<section class="pg">${pageHead("Invigilator's Attendance Sheet", h.hall.name, h.count)}<table class="pt"><thead><tr><th>Sl No</th><th>Seat</th><th>Register No</th><th>Student Name</th><th>Subject</th><th>Candidate's Signature</th></tr></thead><tbody>${list.map((s, i) => `<tr><td>${i + 1}</td><td class="mono">${s.seat}</td><td class="mono">${esc(s.reg)}</td><td>${esc(s.name)}</td><td>${esc(s.subject)}</td><td class="sig"></td></tr>`).join('')}</tbody></table><div class="signs"><div>Invigilator</div><div>Chief Superintendent</div></div></section>`; }).join('');
+    } else {
+      const all = []; halls.forEach(h => h.grid.flat().filter(Boolean).forEach(s => all.push({ ...s, hall: h.hall.name })));
+      all.sort(byReg);
+      html = `<section class="pg">${pageHead('Master Allotment List', 'All halls', all.length)}<table class="pt"><thead><tr><th>Sl No</th><th>Register No</th><th>Student Name</th><th>Class</th><th>Subject</th><th>Hall</th><th>Seat</th></tr></thead><tbody>${all.map((s, i) => `<tr><td>${i + 1}</td><td class="mono">${esc(s.reg)}</td><td>${esc(s.name)}</td><td>${esc(s.cls)}</td><td>${esc(s.subject)}</td><td>${esc(s.hall)}</td><td class="mono">${s.seat}</td></tr>`).join('')}</tbody></table></section>`;
+    }
+    area.innerHTML = html + `<style>@media print{@page{size:A4 ${kind === 'chart' ? 'landscape' : 'portrait'}}}</style>`;
+    if (!noDialog) setTimeout(() => window.print(), 50);
+  }
+
+  /* ---------- CSV download (opens in Excel) ---------- */
+  function downloadCsv() {
+    const rows = [['Register No', 'Student Name', 'Class', 'Subject', 'Hall', 'Seat', 'Row', 'Bench']];
+    const all = [];
+    state.result.halls.forEach(h => h.grid.flat().filter(Boolean).forEach(s => all.push([s.reg, s.name, s.cls, s.subject, h.hall.name, s.seat, s.row, String.fromCharCode(64 + s.bench)])));
+    all.sort((a, b) => a[0].localeCompare(b[0], undefined, { numeric: true }));
+    const cell = (v, i) => { v = String(v); if (i === 0 && /^0\d+$/.test(v)) return `="${v}"`; return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+    const csv = '﻿' + rows.concat(all).map(r => r.map(cell).join(',')).join('\r\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+    a.download = 'seating-allotment-' + ($('#examDate').value || 'exam') + '.csv';
+    document.body.appendChild(a); a.click(); a.remove();
+    toast('Master list downloaded');
+  }
+
+  /* ---------- Start: show a ready plan so the page is never empty ---------- */
+  state.halls = DemoData.halls.map(h => ({ ...h }));
+  renderHalls();
+  renderStudents();
+  // Links ending in #demo open with the demo plan already generated; #print=chart etc. is for print testing.
+  const hash = location.hash.slice(1);
+  if (/^(demo|print=)/.test(hash)) {
+    $('#demoBtn').click(); generate(false, true);
+    const m = hash.match(/^print=(\w+)/);
+    if (m) printDoc(m[1], true);
+  }
+})();
+</script>
+</body>
+</html>
